@@ -1,0 +1,34 @@
+{
+    "name": "Asciiplant",
+    "configurations": [
+        {
+            "name": "asciiplant-cli",
+            "authors": [
+                "Žans Kļimovičs"
+            ],
+            "copyright": "Copyright © 2019, Žans Kļimovičs",
+            "description": "Asciiplant with command line interface",
+            "license": "MIT",
+            "targetType": "executable",
+            "mainSourceFile": "source/asciiplant/cli/app.d",
+            "excludedSourceFiles": [ "source/asciiplant/gui/*" ],
+            "targetName": "asciiplant-cli"
+        },
+        {
+            "name": "asciiplant-gui",
+            "authors": [
+                "Žans Kļimovičs"
+            ],
+            "copyright": "Copyright © 2019, Žans Kļimovičs",
+            "description": "Asciiplant with graphical user interface",
+            "license": "MIT",
+            "targetType": "executable",
+            "mainSourceFile": "source/asciiplant/gui/app.d",
+            "excludedSourceFiles": [ "source/asciiplant/cli/*" ],
+            "targetName": "asciiplant-gui",
+            "dependencies": {
+                "dlangui": "~>0.9.182"
+            }
+        }
+    ]
+}
