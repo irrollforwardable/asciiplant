@@ -3,6 +3,8 @@ module asciiplant.cli;
 import asciiplant.core;
 import std.string: isNumeric;
 import std.conv: to;
+import std.ascii: newline;
+import std.array: replace;
 import std.stdio;
 
 enum DataType {STR, INT, MULTIPLE};
@@ -40,6 +42,20 @@ class Command
     private void execute(char[][] arguments)
     {
         if (func !is null) func.run(arguments);
+    }
+
+    @property ulong mandatoryParamCount()
+    {
+        ulong result = 0;
+        foreach (Parameter param; parameters) {
+            if (param.isMandatory) result++;
+        }
+        return result;
+    }
+
+    @property ulong totalParamCount()
+    {
+        return parameters.length;
     }
 }
 
@@ -97,7 +113,7 @@ class Parser
             {
                 override void run(char[][] arguments)
                 {
-                    Node node = workspace.createNode(arguments[0].idup);
+                    Node node = workspace.createNode(arguments[0].replace(['\\', 'n'], newline).idup);
                     writeln("Node created with id: ", node.id);
                     drawInConsole();
                 }
@@ -575,9 +591,10 @@ class Parser
         }
         
         // Final argument validation
-        if (currCommand.parameters.length != currCommand.parameters.length) {
+        if (currCommand.mandatoryParamCount != arguments.length
+                && currCommand.totalParamCount != arguments.length) {
             writeln("Invalid number of arguments: expected ", currCommand.parameters.length,
-                    " arguments, received ", currCommand.parameters.length, "Type 'help ",
+                    " argument(-s), instead received ", arguments.length, ".\nType 'help ",
                     currCommand.name, "' for instructions");
             return;
         }

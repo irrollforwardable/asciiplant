@@ -9,10 +9,10 @@ import std.typecons: Tuple, tuple;
 import std.algorithm.searching: minElement;
 import std.range: enumerate;
 import std.conv;
+import std.ascii: newline;
 import std.stdio;
 
 private const char EMPTY_CHAR = ' ';
-private const char NEWLINE_CHAR = '\n';
 
 // TODO split into smaller modules and create a package
 
@@ -698,7 +698,7 @@ class Canvas
     {
         char[] result;
         foreach (ref char[] line; area) {
-            result ~= line ~ NEWLINE_CHAR;
+            result ~= line ~ newline;
         }
         return result.idup;
     }
