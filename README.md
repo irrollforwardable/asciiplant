@@ -9,6 +9,9 @@ Location: `source/asciiplant/gui/app.d`
 
 DUB build: `dub build --config=asciiplant-gui --build=plain --arch=x86_64`
 
+![Alt Text](https://media.giphy.com/media/fSLeUc8nmSzATCVKX5/giphy.gif)
+
+
 ### Command line tool
 Location: `source/asciiplant/cli/app.d`
 
