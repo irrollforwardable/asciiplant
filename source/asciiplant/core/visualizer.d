@@ -75,7 +75,25 @@ class AsciiVisualizer
     
     public Node getNodeAt(long x, long y)
     {
-        return null;  // TODO
+        foreach (ref Box box; boxes) {
+            if (x >= box.coord.x && x < box.coord.x + box.width
+                    && y >= box.coord.y && y < box.coord.y + box.height) {
+                return box.node;
+            }
+        }
+        return null;
+    }
+
+    public Link getLinkAt(long x, long y)
+    {
+        foreach (ref Arrow arrow; arrows) {
+            foreach (ref Coord arrowCoord; arrow.coordSequence) {
+                if (x == arrowCoord.x && y == arrowCoord.y) {
+                    return arrow.link;
+                }
+            }
+        }
+        return null;
     }
     
     private void normalize()
@@ -110,10 +128,9 @@ class AsciiVisualizer
         }
         foreach (ref Arrow arrow; arrows) {
             foreach (ref Coord coord; arrow.coordSequence) {
-                // TODO not working properly now
-                //if (x == coord.x && y == coord.y) {
-                //    return arrow;
-                //}
+                if (x == coord.x && y == coord.y) {
+                    return arrow;
+                }
             }
         }
         return null;
@@ -287,8 +304,7 @@ class AsciiVisualizer
                 
                 if (openPoints.canFind!(openPoint => 
                                             nextPoint.coord.x == openPoint.coord.x
-                                            && nextPoint.coord.y == openPoint.coord.y
-                                            && nextPoint.g > openPoint.g)) {
+                                            && nextPoint.coord.y == openPoint.coord.y)) {
                     continue;
                 }
                 

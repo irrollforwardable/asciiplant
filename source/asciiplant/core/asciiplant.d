@@ -194,6 +194,28 @@ public class Workspace
         string result = visualize();
         fileHandler.saveStringToFile(result, filename);
     }
+
+    /**
+     * Get Node of the Box which contains provided x and y coordinate.
+     * Params:
+     *  x - x coordinate
+     *  y - y coordinate
+     */
+    public Node getNodeAt(long x, long y)
+    {
+        return asciiVisualizer.getNodeAt(x, y);
+    }
+
+    /**
+     * Get Link of the Arrow which contains provided x and y coordinate.
+     * Params:
+     *  x - x coordinate
+     *  y - y coordinate
+     */
+    public Link getLinkAt(long x, long y)
+    {
+        return asciiVisualizer.getLinkAt(x, y);
+    }
     
     @property Node[] nodes() {
         return modelHandler.rawData.nodes;
