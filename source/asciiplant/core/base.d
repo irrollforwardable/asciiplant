@@ -539,7 +539,7 @@ class Settings
 
 interface IFileHandler
 {
-    RawData loadDataFromFile(string filename);
-    void saveDataToFile(RawData rawData, string filename);
+    RawData loadDataFromFile(string filename, ref Settings settings);
+    void saveDataToFile(RawData rawData, Settings settings, string filename);
     void saveStringToFile(string content, string filename);
 }

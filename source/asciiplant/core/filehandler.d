@@ -10,12 +10,25 @@ class FileHandler : IFileHandler
     import std.file;
     import std.algorithm: filter;
     
-    override public RawData loadDataFromFile(string filename)
+    override public RawData loadDataFromFile(string filename, ref Settings settings)
     {
         string xmlstr = cast(string) read(filename);
         check(xmlstr);
         
         auto parser = new DocumentParser(xmlstr);
+
+        parser.onStartTag["settings"] = (ElementParser parser)
+        {
+            parser.onEndTag["direction"] = (in Element e) { settings.direction = to!Direction(e.text()); };
+            parser.onEndTag["margin-x"] = (in Element e) { settings.boxMarginX = to!long(e.text()); };
+            parser.onEndTag["margin-y"] = (in Element e) { settings.boxMarginY = to!long(e.text()); };
+            parser.onEndTag["join-to-center"] = (in Element e) { settings.isJoinToCenter = to!bool(e.text()); };
+            parser.onEndTag["boxes-first"] = (in Element e) { settings.isCreateAllBoxesFirst = to!bool(e.text()); };
+            parser.onEndTag["show-arrow-descr"] = (in Element e) {
+                settings.isShowArrowDescriptions = to!bool(e.text());
+            };
+            parser.parse();
+        };
         
         // TODO nodes/node links/link
         
@@ -53,9 +66,19 @@ class FileHandler : IFileHandler
         return new RawData(nodes, links);
     }
     
-    override public void saveDataToFile(RawData rawData, string filename)
+    override public void saveDataToFile(RawData rawData, Settings settings, string filename)
     {
         Document document = new Document(new Tag("workspace"));
+        
+        Element settingsElement = new Element("settings");
+        settingsElement ~= new Element("direction", to!string(settings.direction));
+        settingsElement ~= new Element("margin-x", to!string(settings.boxMarginX));
+        settingsElement ~= new Element("margin-y", to!string(settings.boxMarginY));
+        settingsElement ~= new Element("join-to-center", to!string(settings.isJoinToCenter));
+        settingsElement ~= new Element("boxes-first", to!string(settings.isCreateAllBoxesFirst));
+        settingsElement ~= new Element("show-arrow-descr", to!string(settings.isShowArrowDescriptions));
+        // TODO box and arrow chars
+        
         Element nodes = new Element("nodes");
         Element links = new Element("links");
         foreach (ref Node node; rawData.nodes) {
@@ -73,6 +96,8 @@ class FileHandler : IFileHandler
             linkElement ~= new Element("is-marked", to!string(link.isMarked));
             links ~= linkElement;
         }
+        
+        document ~= settingsElement;
         document ~= nodes;
         document ~= links;
         std.file.write(filename, document.toString);

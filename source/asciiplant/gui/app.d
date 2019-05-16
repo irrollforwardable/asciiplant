@@ -78,6 +78,7 @@ extern (C) int UIAppMain(string[] args)
     mainLayout.onAction = delegate(Widget source, const Action a) {
         if (a.id == ACTION_FILE_NEW) {
             workspaceContainer.workspace = new Workspace();
+            workspaceContainer.loadSettings();
             workspaceContainer.draw();
             return true;
         } else if (a.id == ACTION_FILE_OPEN) {
@@ -91,6 +92,7 @@ extern (C) int UIAppMain(string[] args)
                     string filename = (cast(FileDialog)dialog).filenames[0];
                     workspaceContainer.workspace = new Workspace();
                     workspaceContainer.workspace.loadFromFile(filename);
+                    workspaceContainer.loadSettings();
                     workspaceContainer.filename = filename;
                     workspaceContainer.draw();
                 }
@@ -562,6 +564,25 @@ class WorkspaceContainer : VerticalLayout
         statusBar.text(text);
     }
 
+    private void loadSettings()
+    {
+        if (workspace.settings.direction == Direction.N) directionList.selectedItemIndex = 0;
+        else if (workspace.settings.direction == Direction.NE) directionList.selectedItemIndex = 1;
+        else if (workspace.settings.direction == Direction.E) directionList.selectedItemIndex = 2;
+        else if (workspace.settings.direction == Direction.SE) directionList.selectedItemIndex = 3;
+        else if (workspace.settings.direction == Direction.S) directionList.selectedItemIndex = 4;
+        else if (workspace.settings.direction == Direction.SW) directionList.selectedItemIndex = 5;
+        else if (workspace.settings.direction == Direction.W) directionList.selectedItemIndex = 6;
+        else if (workspace.settings.direction == Direction.NW) directionList.selectedItemIndex = 7;
+        
+        marginXEdit.text = to!dstring(to!string(workspace.settings.boxMarginX));
+        marginYEdit.text = to!dstring(to!string(workspace.settings.boxMarginY));
+        
+        isLinkToCenterField.selectedItemIndex = workspace.settings.isJoinToCenter ? 0 : 1;
+        isDrawBoxesFirstField.selectedItemIndex = workspace.settings.isCreateAllBoxesFirst ? 0 : 1;
+        isShowLinkDescrField.selectedItemIndex = workspace.settings.isShowArrowDescriptions ? 0 : 1;
+    }
+
     private void applySettings()
     {
         if (!isNumeric(to!string(marginXEdit.text))) {
@@ -578,10 +599,10 @@ class WorkspaceContainer : VerticalLayout
         else if (directionList.selectedItemIndex == 5) workspace.settings.direction = Direction.SW;
         else if (directionList.selectedItemIndex == 6) workspace.settings.direction = Direction.W;
         else if (directionList.selectedItemIndex == 7) workspace.settings.direction = Direction.NW;
-
+        
         workspace.settings.boxMarginX(to!long(marginXEdit.text));
         workspace.settings.boxMarginY(to!long(marginYEdit.text));
-
+        
         workspace.settings.isJoinToCenter(isLinkToCenterField.selectedItemIndex == 0);
         workspace.settings.isCreateAllBoxesFirst(isDrawBoxesFirstField.selectedItemIndex == 0);
         workspace.settings.isShowArrowDescriptions(isShowLinkDescrField.selectedItemIndex == 0);

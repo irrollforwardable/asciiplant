@@ -171,7 +171,7 @@ public class Workspace
      */
     public void loadFromFile(string filename)
     {
-        modelHandler.rawData = fileHandler.loadDataFromFile(filename);
+        modelHandler.rawData = fileHandler.loadDataFromFile(filename, _settings);
     }
     
     /**
@@ -181,7 +181,7 @@ public class Workspace
      */
     public void saveDataToFile(string filename)
     {
-        fileHandler.saveDataToFile(modelHandler.rawData, filename);
+        fileHandler.saveDataToFile(modelHandler.rawData, _settings, filename);
     }
     
     /**
