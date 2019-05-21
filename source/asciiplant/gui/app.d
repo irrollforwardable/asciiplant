@@ -371,6 +371,7 @@ extern (C) int UIAppMain(string[] args)
                     foreach (ref Path p; paths) {
                         workspaceContainer.workspace.markPath(p);
                     }
+                    workspaceContainer.setPathsText(paths);
                     workspaceContainer.resetTemporaryNodes();
                     workspaceContainer.draw();
                 }
@@ -389,6 +390,7 @@ extern (C) int UIAppMain(string[] args)
                     foreach (ref Path p; paths) {
                         workspaceContainer.workspace.markPath(p);
                     }
+                    workspaceContainer.setPathsText(paths);
                     workspaceContainer.resetTemporaryNodes();
                     workspaceContainer.draw();
                 }
@@ -407,6 +409,7 @@ extern (C) int UIAppMain(string[] args)
                     foreach (ref Path p; paths) {
                         workspaceContainer.workspace.markPath(p);
                     }
+                    workspaceContainer.setPathsText(paths);
                     workspaceContainer.resetTemporaryNodes();
                     workspaceContainer.draw();
                 }
@@ -425,6 +428,7 @@ extern (C) int UIAppMain(string[] args)
                     foreach (ref Path p; paths) {
                         workspaceContainer.workspace.markPath(p);
                     }
+                    workspaceContainer.setPathsText(paths);
                     workspaceContainer.resetTemporaryNodes();
                     workspaceContainer.draw();
                 }
@@ -434,6 +438,7 @@ extern (C) int UIAppMain(string[] args)
             return true;
         } else if (a.id == ACTION_UNMARK_PATHS) {
             workspaceContainer.workspace.resetAllMarks();
+            workspaceContainer.resetPathsText();
             workspaceContainer.draw();
             return true;
         } else if (a.id == ACTION_DRAW) {
@@ -467,6 +472,7 @@ class WorkspaceContainer : VerticalLayout
 {
     private Workspace workspace;
     private CustomEditBox mainText;
+    private EditBox pathsDisplay;
     private TextWidget statusBar;
     private ComboBox directionList, isLinkToCenterField, isDrawBoxesFirstField, isShowLinkDescrField;
     private EditLine marginXEdit, marginYEdit;
@@ -532,10 +538,12 @@ class WorkspaceContainer : VerticalLayout
         settingsLayout.addChild(settingsTable);
         settingsDock.bodyWidget(settingsLayout.layoutWidth(FILL_PARENT));
         
-        DockWindow dw3 = new DockWindow("3");
-        dw3.caption.textResource("CAP_PATHS"c);
-        dw3.dockAlignment(DockAlignment.Bottom);
-        dockLayout.addDockedWindow(dw3);
+        DockWindow pathsDock = new DockWindow("3");
+        pathsDock.caption.textResource("CAP_PATHS"c);
+        pathsDock.dockAlignment(DockAlignment.Bottom);
+        pathsDisplay = new EditBox();
+        pathsDock.bodyWidget(pathsDisplay.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT));
+        dockLayout.addDockedWindow(pathsDock);
         
         dockLayout.bodyWidget(mainText);
         
@@ -606,6 +614,20 @@ class WorkspaceContainer : VerticalLayout
         workspace.settings.isJoinToCenter(isLinkToCenterField.selectedItemIndex == 0);
         workspace.settings.isCreateAllBoxesFirst(isDrawBoxesFirstField.selectedItemIndex == 0);
         workspace.settings.isShowArrowDescriptions(isShowLinkDescrField.selectedItemIndex == 0);
+    }
+
+    private void setPathsText(ref Path[] paths)
+    {
+        string result = to!string(pathsDisplay.text);
+        foreach (size_t index, ref Path p; paths) {
+            result ~= "\n" ~ to!string(index + 1) ~ ")\t" ~ p.toString;
+        }
+        pathsDisplay.text = to!dstring(result);
+    }
+
+    private void resetPathsText()
+    {
+        pathsDisplay.text = to!dstring("");
     }
 
     private void resetTemporaryNodes()

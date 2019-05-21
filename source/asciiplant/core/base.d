@@ -26,7 +26,16 @@ class Node
     override public string toString() const pure @safe
     {
         import std.conv: to;
-        return "id=" ~ to!string(id) ~ ": " ~ content;
+        import std.string: splitLines;
+        import std.utf: toUCSindex;
+
+        size_t limit = 17;  // TODO parameter in Settings
+        auto substr = splitLines(content[0 .. (limit > content.length ? content.length : content.toUCSindex(limit))])[0];
+        if (substr.length < content.length) {
+            substr ~= "...";
+        }
+
+        return "id=" ~ to!string(id) ~ ": " ~ substr;
     }
 }
 
@@ -70,9 +79,9 @@ class Path
         string result = "";
         for (size_t i = 0; i < links.length; i++) {
             if (i == 0) {
-                result ~= links[i].fromNode.content;
+                result ~= links[i].fromNode.toString;
             }
-            result ~= " --[" ~ links[i].description ~ "]--> " ~ links[i].toNode.content;
+            result ~= " --" ~ (links[i].description.length > 0 ? "[" ~ links[i].description ~ "]" : "") ~ "--> " ~ links[i].toNode.toString;
         }
         return result;
     }

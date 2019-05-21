@@ -252,13 +252,6 @@ class AsciiVisualizer
         Tuple!(int, int)[] nextRelXYs = [tuple(-1, -1), tuple(0, -1), tuple(1, -1), tuple(1, 0), tuple(1, 1),
                                          tuple(0, 1), tuple(-1, 1), tuple(-1, 0)];
         
-        Coord topLeftCoord = getMinCoord();
-        Coord bottomRightCoord = getMaxCoord();
-        long leftBorder = topLeftCoord.x - 5;    // TODO value 5 must depend on number of links
-        long topBorder = topLeftCoord.y - 5;     // TODO value 5 must depend on number of links
-        long rightBorder = bottomRightCoord.x + 5;  // TODO value 5 must depend on number of links
-        long bottomBorder = bottomRightCoord.y + 5; // TODO value 5 must depend on number of links
-        
         while (openPoints.length > 0) {
             auto minFPoint = openPoints.enumerate.minElement!"a.value.f";
             long currIndex = minFPoint[0];
@@ -288,8 +281,7 @@ class AsciiVisualizer
                 
                 if (getObjectAt(nextX, nextY) !is null
                         || visitedPoints.canFind!(
-                                visitedPoint => nextX == visitedPoint.coord.x && nextY == visitedPoint.coord.y)
-                        || (nextX < leftBorder && nextX > rightBorder && nextY < topBorder && nextY > bottomBorder)) {
+                                visitedPoint => nextX == visitedPoint.coord.x && nextY == visitedPoint.coord.y)) {
                     continue;
                 }
                 
@@ -443,7 +435,6 @@ class AsciiVisualizer
                             new Coord(toPlug.coord.x, toPlug.coord.y),
                             link.description.length
                         );
-                        debug writeln(coordSequence);
                         
                         // Calculate how many times coordSequence crosses other arrows
                         int crosses = 0;
@@ -454,35 +445,39 @@ class AsciiVisualizer
                                 }
                             }
                         }
-                        
-                        plugsPathTriples ~= new PlugsPathTriple(fromPlug, coordSequence, toPlug, crosses);
+
+                        if (coordSequence.length > 0) {
+                            plugsPathTriples ~= new PlugsPathTriple(fromPlug, coordSequence, toPlug, crosses);
+                        }
                         debug writeln("Path coords from ", fromBox.lines[0], "(", fromPlug.coord.x, ", ", fromPlug.coord.y, ") >>> ", toBox.lines[0], "(", toPlug.coord.x, ", ", toPlug.coord.y, ") = ", coordSequence);
                     }
                 }
             }
         }
-        
-        // Find plugsPathTriple with the shortest path that ideally does not cross any other arrows
-        // TODO use std.algorithm.sorting.multiSort instead
-        PlugsPathTriple[] pptSorted = plugsPathTriples.sort!(
-            (ppt1, ppt2) => ppt1.crosses != ppt2.crosses 
-                ? ppt1.crosses < ppt2.crosses 
-                : ppt1.path.length < ppt2.path.length)
-            .release;
-        
-        // Close both plugs
-        pptSorted[0].fromPlug.isAvailable = false;
-        pptSorted[0].toPlug.isAvailable = false;
-        
-        // Create new Plugs if option to join to center is turned on
-        if (settings.isJoinToCenter) {
-            pptSorted[0].fromPlug.box.createPlugNextTo(pptSorted[0].fromPlug);
-            pptSorted[0].toPlug.box.createPlugNextTo(pptSorted[0].toPlug);
-        }
 
-        arrows ~= new Arrow(link, fromBox, toBox,
-                            pptSorted[0].fromPlug, pptSorted[0].toPlug,
-                            pptSorted[0].path);
+        if (plugsPathTriples.length > 0) {
+            // Find plugsPathTriple with the shortest path that ideally does not cross any other arrows
+            // TODO use std.algorithm.sorting.multiSort instead
+            PlugsPathTriple[] pptSorted = plugsPathTriples.sort!(
+                (ppt1, ppt2) => ppt1.crosses != ppt2.crosses 
+                    ? ppt1.crosses < ppt2.crosses 
+                    : ppt1.path.length < ppt2.path.length)
+                .release;
+        
+            // Close both plugs
+            pptSorted[0].fromPlug.isAvailable = false;
+            pptSorted[0].toPlug.isAvailable = false;
+        
+            // Create new Plugs if option to join to center is turned on
+            if (settings.isJoinToCenter) {
+                pptSorted[0].fromPlug.box.createPlugNextTo(pptSorted[0].fromPlug);
+                pptSorted[0].toPlug.box.createPlugNextTo(pptSorted[0].toPlug);
+            }
+
+            arrows ~= new Arrow(link, fromBox, toBox,
+                                pptSorted[0].fromPlug, pptSorted[0].toPlug,
+                                pptSorted[0].path);
+        }
     }
 }
 
