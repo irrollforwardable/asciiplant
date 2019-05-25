@@ -557,6 +557,7 @@ class WorkspaceContainer : VerticalLayout
         statusBar.layoutWidth(FILL_PARENT);
         this.addChild(statusBar);
 
+        loadSettings();
         applySettings();
     }
 

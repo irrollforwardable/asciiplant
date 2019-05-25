@@ -141,7 +141,7 @@ class Settings
             '>', '>',    // Arrow right unmarked / marked
             'v', 'v',    // Arrow down unmarked / marked
             '<', '<',    // Arrow left unmarked / marked
-            0, 0, true, true, true
+            0, 0, false, true, true
         );
     }
     
