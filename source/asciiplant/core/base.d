@@ -12,11 +12,11 @@ enum Direction {NW, N, NE, E, SE, S, SW, W};
 class Node
 {
     public int id;
-    public string content;
+    public dstring content;
     public Link[] incomingLinks, outgoingLinks;
     public bool isMarked;
     
-    this(int id, string content)
+    this(int id, dstring content)
     {
         this.id = id;
         this.content = content;
@@ -25,9 +25,9 @@ class Node
     
     override public string toString() const pure @safe
     {
-        import std.conv: to;
         import std.string: splitLines;
         import std.utf: toUCSindex;
+        import std.conv: to;
 
         size_t limit = 17;  // TODO parameter in Settings
         auto substr = splitLines(content[0 .. (limit > content.length ? content.length : content.toUCSindex(limit))])[0];
@@ -35,7 +35,7 @@ class Node
             substr ~= "...";
         }
 
-        return "id=" ~ to!string(id) ~ ": " ~ substr;
+        return "id=" ~ to!string(id) ~ ": " ~ to!string(substr);
     }
 }
 
@@ -44,11 +44,11 @@ class Node
 */
 class Link
 {
-    public string description;
+    public dstring description;
     public Node fromNode, toNode;
     public bool isMarked;
     
-    this(Node fromNode, Node toNode, string description)
+    this(Node fromNode, Node toNode, dstring description)
     {
         this.fromNode = fromNode;
         this.toNode = toNode;
@@ -76,12 +76,14 @@ class Path
     
     override public string toString() const pure @safe
     {
+        import std.conv: to;
+        
         string result = "";
         for (size_t i = 0; i < links.length; i++) {
             if (i == 0) {
                 result ~= links[i].fromNode.toString;
             }
-            result ~= " --" ~ (links[i].description.length > 0 ? "[" ~ links[i].description ~ "]" : "") ~ "--> " ~ links[i].toNode.toString;
+            result ~= " --" ~ (links[i].description.length > 0 ? "[" ~ to!string(links[i].description) ~ "]" : "") ~ "--> " ~ links[i].toNode.toString;
         }
         return result;
     }
@@ -113,7 +115,7 @@ class RawData
 class Settings
 {
     private Direction _direction;
-    private char boxNW, boxNWm, boxN, boxNm, boxNE, boxNEm, boxE, boxEm, boxSE, boxSEm, boxS, boxSm, boxSW, boxSWm,
+    private dchar boxNW, boxNWm, boxN, boxNm, boxNE, boxNEm, boxE, boxEm, boxSE, boxSEm, boxS, boxSm, boxSW, boxSWm,
     boxW, boxWm, arrH, arrHm, arrV, arrVm, arrSWNE, arrSWNEm, arrNWSE, arrNWSEm, arrTop, arrTopm,
     arrBottom, arrBottomm, arrUp, arrUpm, arrRight, arrRightm, arrDown, arrDownm, arrLeft, arrLeftm;
     private long _boxMarginX, _boxMarginY;
@@ -145,11 +147,11 @@ class Settings
         );
     }
     
-    this(Direction direction, char boxNW, char boxNWm, char boxN, char boxNm, char boxNE, char boxNEm,
-         char boxE, char boxEm, char boxSE, char boxSEm, char boxS, char boxSm, char boxSW, char boxSWm,
-         char boxW, char boxWm, char arrH, char arrHm, char arrV, char arrVm, char arrSWNE, char arrSWNEm,
-         char arrNWSE, char arrNWSEm, char arrTop, char arrTopm, char arrBottom, char arrBottomm, char arrUp,
-         char arrUpm, char arrRight, char arrRightm, char arrDown, char arrDownm, char arrLeft, char arrLeftm,
+    this(Direction direction, dchar boxNW, dchar boxNWm, dchar boxN, dchar boxNm, dchar boxNE, dchar boxNEm,
+         dchar boxE, dchar boxEm, dchar boxSE, dchar boxSEm, dchar boxS, dchar boxSm, dchar boxSW, dchar boxSWm,
+         dchar boxW, dchar boxWm, dchar arrH, dchar arrHm, dchar arrV, dchar arrVm, dchar arrSWNE, dchar arrSWNEm,
+         dchar arrNWSE, dchar arrNWSEm, dchar arrTop, dchar arrTopm, dchar arrBottom, dchar arrBottomm, dchar arrUp,
+         dchar arrUpm, dchar arrRight, dchar arrRightm, dchar arrDown, dchar arrDownm, dchar arrLeft, dchar arrLeftm,
          long boxMarginX, long boxMarginY, bool isCreateAllBoxesFirst, bool isJoinToCenter,
          bool isShowArrowDescriptions)
     {
@@ -197,7 +199,7 @@ class Settings
         this._isShowArrowDescriptions = isShowArrowDescriptions;
     }
     
-    public char getBoxNW(bool isMarked)
+    public dchar getBoxNW(bool isMarked)
     {
         if (!isMarked)
             return boxNW;
@@ -205,7 +207,7 @@ class Settings
             return boxNWm;
     }
     
-    public void setBoxNW(char value, bool isMarked)
+    public void setBoxNW(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxNW = value;
@@ -213,7 +215,7 @@ class Settings
             boxNWm = value;
     }
     
-    public char getBoxN(bool isMarked)
+    public dchar getBoxN(bool isMarked)
     {
         if (!isMarked)
             return boxN;
@@ -221,7 +223,7 @@ class Settings
             return boxNm;
     }
     
-    public void setBoxN(char value, bool isMarked)
+    public void setBoxN(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxN = value;
@@ -229,7 +231,7 @@ class Settings
             boxNm = value;
     }
     
-    public char getBoxNE(bool isMarked)
+    public dchar getBoxNE(bool isMarked)
     {
         if (!isMarked)
             return boxNE;
@@ -237,7 +239,7 @@ class Settings
             return boxNEm;
     }
     
-    public void setBoxNE(char value, bool isMarked)
+    public void setBoxNE(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxNE = value;
@@ -245,7 +247,7 @@ class Settings
             boxNEm = value;
     }
     
-    public char getBoxE(bool isMarked)
+    public dchar getBoxE(bool isMarked)
     {
         if (!isMarked)
             return boxE;
@@ -253,7 +255,7 @@ class Settings
             return boxEm;
     }
     
-    public void setBoxE(char value, bool isMarked)
+    public void setBoxE(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxE = value;
@@ -261,7 +263,7 @@ class Settings
             boxEm = value;
     }
     
-    public char getBoxSE(bool isMarked)
+    public dchar getBoxSE(bool isMarked)
     {
         if (!isMarked)
             return boxSE;
@@ -269,7 +271,7 @@ class Settings
             return boxSEm;
     }
     
-    public void setBoxSE(char value, bool isMarked)
+    public void setBoxSE(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxSE = value;
@@ -277,7 +279,7 @@ class Settings
             boxSEm = value;
     }
     
-    public char getBoxS(bool isMarked)
+    public dchar getBoxS(bool isMarked)
     {
         if (!isMarked)
             return boxS;
@@ -285,7 +287,7 @@ class Settings
             return boxSm;
     }
     
-    public void setBoxS(char value, bool isMarked)
+    public void setBoxS(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxS = value;
@@ -293,7 +295,7 @@ class Settings
             boxSm = value;
     }
     
-    public char getBoxSW(bool isMarked)
+    public dchar getBoxSW(bool isMarked)
     {
         if (!isMarked)
             return boxSW;
@@ -301,7 +303,7 @@ class Settings
             return boxSWm;
     }
     
-    public void setBoxSW(char value, bool isMarked)
+    public void setBoxSW(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxSW = value;
@@ -309,7 +311,7 @@ class Settings
             boxSWm = value;
     }
     
-    public char getBoxW(bool isMarked)
+    public dchar getBoxW(bool isMarked)
     {
         if (!isMarked)
             return boxW;
@@ -317,7 +319,7 @@ class Settings
             return boxWm;
     }
     
-    public void setBoxW(char value, bool isMarked)
+    public void setBoxW(dchar value, bool isMarked)
     {
         if (!isMarked)
             boxW = value;
@@ -325,7 +327,7 @@ class Settings
             boxWm = value;
     }
     
-    public char getArrH(bool isMarked)
+    public dchar getArrH(bool isMarked)
     {
         if (!isMarked)
             return arrH;
@@ -333,7 +335,7 @@ class Settings
             return arrHm;
     }
     
-    public void setArrH(char value, bool isMarked)
+    public void setArrH(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrH = value;
@@ -341,7 +343,7 @@ class Settings
             arrHm = value;
     }
     
-    public char getArrV(bool isMarked)
+    public dchar getArrV(bool isMarked)
     {
         if (!isMarked)
             return arrV;
@@ -349,7 +351,7 @@ class Settings
             return arrVm;
     }
     
-    public void setArrV(char value, bool isMarked)
+    public void setArrV(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrV = value;
@@ -357,7 +359,7 @@ class Settings
             arrVm = value;
     }
     
-    public char getArrSWNE(bool isMarked)
+    public dchar getArrSWNE(bool isMarked)
     {
         if (!isMarked)
             return arrSWNE;
@@ -365,7 +367,7 @@ class Settings
             return arrSWNEm;
     }
     
-    public void setArrSWNE(char value, bool isMarked)
+    public void setArrSWNE(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrSWNE = value;
@@ -373,7 +375,7 @@ class Settings
             arrSWNEm = value;
     }
     
-    public char getArrNWSE(bool isMarked)
+    public dchar getArrNWSE(bool isMarked)
     {
         if (!isMarked)
             return arrNWSE;
@@ -381,7 +383,7 @@ class Settings
             return arrNWSEm;
     }
     
-    public void setArrNWSE(char value, bool isMarked)
+    public void setArrNWSE(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrNWSE = value;
@@ -389,7 +391,7 @@ class Settings
             arrNWSEm = value;
     }
     
-    public char getArrTop(bool isMarked)
+    public dchar getArrTop(bool isMarked)
     {
         if (!isMarked)
             return arrTop;
@@ -397,7 +399,7 @@ class Settings
             return arrTopm;
     }
     
-    public void setArrTop(char value, bool isMarked)
+    public void setArrTop(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrTop = value;
@@ -405,7 +407,7 @@ class Settings
             arrTopm = value;
     }
     
-    public char getArrBottom(bool isMarked)
+    public dchar getArrBottom(bool isMarked)
     {
         if (!isMarked)
             return arrBottom;
@@ -413,7 +415,7 @@ class Settings
             return arrBottomm;
     }
     
-    public void setArrBottom(char value, bool isMarked)
+    public void setArrBottom(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrBottom = value;
@@ -421,7 +423,7 @@ class Settings
             arrBottomm = value;
     }
     
-    public char getArrUp(bool isMarked)
+    public dchar getArrUp(bool isMarked)
     {
         if (!isMarked)
             return arrUp;
@@ -429,7 +431,7 @@ class Settings
             return arrUpm;
     }
     
-    public void setArrUp(char value, bool isMarked)
+    public void setArrUp(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrUp = value;
@@ -437,7 +439,7 @@ class Settings
             arrUpm = value;
     }
     
-    public char getArrRight(bool isMarked)
+    public dchar getArrRight(bool isMarked)
     {
         if (!isMarked)
             return arrRight;
@@ -445,7 +447,7 @@ class Settings
             return arrRightm;
     }
     
-    public void setArrRight(char value, bool isMarked)
+    public void setArrRight(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrRight = value;
@@ -453,7 +455,7 @@ class Settings
             arrRightm = value;
     }
     
-    public char getArrDown(bool isMarked)
+    public dchar getArrDown(bool isMarked)
     {
         if (!isMarked)
             return arrDown;
@@ -461,7 +463,7 @@ class Settings
             return arrDownm;
     }
     
-    public void setArrDown(char value, bool isMarked)
+    public void setArrDown(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrDown = value;
@@ -469,7 +471,7 @@ class Settings
             arrDownm = value;
     }
     
-    public char getArrLeft(bool isMarked)
+    public dchar getArrLeft(bool isMarked)
     {
         if (!isMarked)
             return arrLeft;
@@ -477,7 +479,7 @@ class Settings
             return arrLeftm;
     }
     
-    public void setArrLeft(char value, bool isMarked)
+    public void setArrLeft(dchar value, bool isMarked)
     {
         if (!isMarked)
             arrLeft = value;

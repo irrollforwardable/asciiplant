@@ -9,7 +9,6 @@ import std.typecons: Tuple, tuple;
 import std.algorithm.searching: minElement;
 import std.range: enumerate;
 import std.conv;
-import std.ascii: newline;
 import std.stdio;
 
 private const char EMPTY_CHAR = ' ';
@@ -30,7 +29,7 @@ class AsciiVisualizer
         this.canvas = new Canvas(settings);
     }
     
-    public string getAsciiVisualization(RawData rawData)
+    public dstring getAsciiVisualization(RawData rawData)
     {        
         boxes = [];
         arrows = [];
@@ -484,16 +483,19 @@ class AsciiVisualizer
 class Canvas
 {
     private Settings settings;
-    private char[][] area;
+    private dchar[][] area;
     private long width;  // must not be modified from outside!
+    private dchar carriageReturnChar, newLineChar;
     
     this(Settings settings)
     {
         this.settings = settings;
-        char[] tmpFirst;
+        dchar[] tmpFirst;
         tmpFirst ~= EMPTY_CHAR;
         area ~= tmpFirst;
         width = area[0].length;
+        carriageReturnChar = to!dchar("\r");
+        newLineChar = to!dchar("\n");
     }
     
     private void draw(Box box)
@@ -514,9 +516,9 @@ class Canvas
         }
         
         int yOffset = 0;
-        foreach (string line; box.lines) {
+        foreach (dstring line; box.lines) {
             int xOffset = 0;
-            foreach (char c; line) {
+            foreach (dchar c; line) {
                 // +1 means border line width
                 area[box.coord.y + box.marginY + yOffset + 1][box.coord.x + box.marginX + xOffset + 1] = c;
                 xOffset++;
@@ -669,7 +671,7 @@ class Canvas
     {
         long diff = width - area[0].length;
         if (diff > 0) {
-            foreach (ref char[] line; area) {
+            foreach (ref dchar[] line; area) {
                 for (int i = 0; i < diff; i++) {
                     line ~= EMPTY_CHAR;
                 }
@@ -685,7 +687,7 @@ class Canvas
         long diff = height - area.length;
         if (diff > 0) {
             for (int i = 0; i < diff; i++) {
-                char[] line;
+                dchar[] line;
                 for (int j = 0; j < width; j++) {
                     line ~= EMPTY_CHAR;
                 }
@@ -698,18 +700,18 @@ class Canvas
     
     private void clear()
     {
-        foreach (ref char[] line; area) {
+        foreach (ref dchar[] line; area) {
             for (size_t c = 0; c < line.length; c++) {
                 line[c] = ' ';
             }
         }
     }
     
-    private string toString()
+    private dstring toString()
     {
-        char[] result;
-        foreach (ref char[] line; area) {
-            result ~= line ~ newline;
+        dchar[] result;
+        foreach (ref dchar[] line; area) {
+            result ~= line ~ carriageReturnChar ~ newLineChar;
         }
         return result.idup;
     }
@@ -720,7 +722,7 @@ abstract class Drawable {}
 class Box : Drawable
 {
     private Node node;
-    private string[] lines;
+    private dstring[] lines;
     private Coord coord;
     private long width, height;
     private long marginX, marginY;
@@ -930,10 +932,10 @@ class PlugsPathTriple
     }
 }
 
-private long getMaxLineLength(string[] lines)
+private long getMaxLineLength(dstring[] lines)
 {
     long result = 0;
-    foreach (string line; lines) {
+    foreach (dstring line; lines) {
         if (line.length > result) result = line.length;
     }
     return result;

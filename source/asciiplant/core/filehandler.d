@@ -37,7 +37,7 @@ class FileHandler : IFileHandler
         {
             Node node = new Node(-1, null);
             parser.onEndTag["id"] = (in Element e) { node.id = to!int(e.text()); };
-            parser.onEndTag["content"] = (in Element e) { node.content = e.text(); };
+            parser.onEndTag["content"] = (in Element e) { node.content = to!dstring(e.text()); };
             parser.onEndTag["is-marked"] = (in Element e) { node.isMarked = to!bool(e.text()); };
             parser.parse();
             nodes ~= node;
@@ -47,7 +47,7 @@ class FileHandler : IFileHandler
         parser.onStartTag["link"] = (ElementParser parser)
         {
             Link link = new Link(null, null, null);
-            parser.onEndTag["description"] = (in Element e) { link.description = e.text(); };
+            parser.onEndTag["description"] = (in Element e) { link.description = to!dstring(e.text()); };
             parser.onEndTag["from-node"] = (in Element e) {
                 link.fromNode = findNodeByStringId(nodes, e.text());
                 link.fromNode.outgoingLinks ~= link;
@@ -84,13 +84,13 @@ class FileHandler : IFileHandler
         foreach (ref Node node; rawData.nodes) {
             Element nodeElement = new Element("node");
             nodeElement ~= new Element("id", to!string(node.id));
-            nodeElement ~= new Element("content", node.content);
+            nodeElement ~= new Element("content", to!string(node.content));
             nodeElement ~= new Element("is-marked", to!string(node.isMarked));
             nodes ~= nodeElement;
         }
         foreach (ref Link link; rawData.links) {
             Element linkElement = new Element("link");
-            linkElement ~= new Element("description", link.description);
+            linkElement ~= new Element("description", to!string(link.description));
             linkElement ~= new Element("from-node", to!string(link.fromNode.id));
             linkElement ~= new Element("to-node", to!string(link.toNode.id));
             linkElement ~= new Element("is-marked", to!string(link.isMarked));

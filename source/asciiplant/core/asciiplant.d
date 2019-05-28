@@ -44,7 +44,7 @@ public class Workspace
      *  content = text for the Node
      * Returns: Node
      */
-    public Node createNode(string content)
+    public Node createNode(dstring content)
     {
         return modelHandler.createNode(content);
     }
@@ -77,7 +77,7 @@ public class Workspace
      *  description = link description text
      * Returns: Link
      */
-    public Link linkNodes(Node fromNode, Node toNode, string description)
+    public Link linkNodes(Node fromNode, Node toNode, dstring description)
     {
         return modelHandler.linkNodes(fromNode, toNode, description);
     }
@@ -159,7 +159,7 @@ public class Workspace
      * Generates and returns visualized ASCII diagram string.
      * Returns: string
      */
-    public string visualize()
+    public dstring visualize()
     {
         return asciiVisualizer.getAsciiVisualization(modelHandler.rawData);
     }
@@ -191,8 +191,9 @@ public class Workspace
      */
     public void saveVisualizationToFile(string filename)
     {
-        string result = visualize();
-        fileHandler.saveStringToFile(result, filename);
+        import std.conv: to;
+        dstring result = visualize();
+        fileHandler.saveStringToFile(to!string(result), filename);
     }
 
     /**

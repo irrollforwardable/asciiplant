@@ -12,19 +12,19 @@ enum DataType {STR, INT, MULTIPLE};
 class Command
 {
     private Command parent;
-    private string name, description;
+    private dstring name, description;
     private Command[] nextCommands;
     private Parameter[] parameters;
     private Runnable func;
     
-    this(string name, string description, Command[] nextCommands)
+    this(dstring name, dstring description, Command[] nextCommands)
     {
         this.name = name;
         this.description = description;
         this.nextCommands = nextCommands;
     }
     
-    this(string name, string description, Parameter[] parameters, Runnable func)
+    this(dstring name, dstring description, Parameter[] parameters, Runnable func)
     {
         this.name = name;
         this.description = description;
@@ -32,14 +32,14 @@ class Command
         this.func = func;
     }
     
-    this(string name, string description, Runnable func)
+    this(dstring name, dstring description, Runnable func)
     {
         this.name = name;
         this.description = description;
         this.func = func;
     }
     
-    private void execute(char[][] arguments)
+    private void execute(dchar[][] arguments)
     {
         if (func !is null) func.run(arguments);
     }
@@ -62,10 +62,17 @@ class Command
 class Parameter
 {
     private DataType dataType;
-    private string description;
+    private dstring description;
     private bool isMandatory;
     
     this(DataType dataType, string description, bool isMandatory)
+    {
+        this.dataType = dataType;
+        this.description = to!dstring(description);
+        this.isMandatory = isMandatory;
+    }
+
+    this(DataType dataType, dstring description, bool isMandatory)
     {
         this.dataType = dataType;
         this.description = description;
@@ -75,7 +82,7 @@ class Parameter
 
 interface Runnable
 {
-    void run(char[][] arguments);
+    void run(dchar[][] arguments);
 }
 
 class Parser
@@ -83,8 +90,8 @@ class Parser
     private bool isRun, isAutoDraw;
     private Workspace workspace;
     private Command topLevelCmd;
-    private string ON = "on";
-    private string OFF = "off";
+    private dstring ON = "on"d;
+    private dstring OFF = "off"d;
     
     this(Workspace workspace)
     {
@@ -96,7 +103,7 @@ class Parser
             "nodes", "Display list of nodes",
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     foreach (ref Node node; workspace.nodes) {
                         writeln(node);
@@ -111,7 +118,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node node = workspace.createNode(arguments[0].replace(['\\', 'n'], newline).idup);
                     writeln("Node created with id: ", node.id);
@@ -125,7 +132,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node node = workspace.findNodeById(to!int(arguments[0].idup));
                     if (node !is null) {
@@ -146,13 +153,13 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node fromNode = workspace.findNodeById(to!int(arguments[0].idup));
                     if (fromNode is null) writeln("Node with id ", arguments[0], " not found");
                     Node toNode = workspace.findNodeById(to!int(arguments[1].idup));
                     if (toNode is null) writeln("Node with id ", arguments[1], " not found");
-                    string description = arguments.length == 3 ? arguments[2].idup : "";
+                    dstring description = arguments.length == 3 ? arguments[2].idup : ""d;
                     Link link = workspace.linkNodes(fromNode, toNode, description);
                     if (link !is null) {
                         writeln("Link between nodes (", fromNode.id, ") and (", toNode.id, ") created");
@@ -168,7 +175,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node fromNode = workspace.findNodeById(to!int(arguments[0].idup));
                     Node toNode = workspace.findNodeById(to!int(arguments[1].idup));
@@ -190,7 +197,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node fromNode = workspace.findNodeById(to!int(arguments[0].idup));
                     Node toNode = workspace.findNodeById(to!int(arguments[1].idup));
@@ -215,7 +222,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     Node fromNode = workspace.findNodeById(to!int(arguments[0].idup));
                     Node toNode = workspace.findNodeById(to!int(arguments[1].idup));
@@ -237,7 +244,7 @@ class Parser
             "xp", "Reset all marked paths",
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     workspace.resetAllMarks();
                     drawInConsole();
@@ -250,9 +257,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    workspace.loadFromFile(arguments[0].idup);
+                    workspace.loadFromFile(to!string(arguments[0].idup));
                     writeln("Data structure loaded from file: ", arguments[0]);
                     drawInConsole();
                 }
@@ -265,9 +272,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    workspace.saveDataToFile(arguments[0].idup);
+                    workspace.saveDataToFile(to!string(arguments[0].idup));
                     writeln("Data structure saved to file: ", arguments[0]);
                 }
             }
@@ -278,9 +285,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    workspace.saveVisualizationToFile(arguments[0].idup);
+                    workspace.saveVisualizationToFile(to!string(arguments[0].idup));
                     writeln("Visualization saved to file: ", arguments[0]);
                 }
             }
@@ -295,9 +302,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string airArgument = arguments[0].dup;
+                    dstring airArgument = arguments[0].dup;
                     if (airArgument == "n") {
                         workspace.settings.direction = Direction.N;
                         drawInConsole();
@@ -334,7 +341,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     workspace.settings.boxMarginX = to!int(arguments[0].idup);
                     drawInConsole();
@@ -347,7 +354,7 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     workspace.settings.boxMarginY = to!int(arguments[0].idup);
                     drawInConsole();
@@ -360,9 +367,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string argValue = arguments[0].idup;
+                    dstring argValue = arguments[0].idup;
                     if (argValue == ON) {
                         workspace.settings.isCreateAllBoxesFirst = true;
                         drawInConsole();
@@ -381,9 +388,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string argValue = arguments[0].idup;
+                    dstring argValue = arguments[0].idup;
                     if (argValue == ON) {
                         workspace.settings.isJoinToCenter = true;
                         drawInConsole();
@@ -402,9 +409,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string argValue = arguments[0].idup;
+                    dstring argValue = arguments[0].idup;
                     if (argValue == ON) {
                         workspace.settings.isShowArrowDescriptions = true;
                         drawInConsole();
@@ -423,9 +430,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string argValue = arguments[0].idup;
+                    dstring argValue = arguments[0].idup;
                     if (argValue == ON) {
                         isAutoDraw = true;
                     } else if (argValue == OFF) {
@@ -445,7 +452,7 @@ class Parser
             "draw", "Show current data visualization in console",
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     if (workspace.nodes.length > 0) {
                         writeln(workspace.visualize());
@@ -462,9 +469,9 @@ class Parser
             ],
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
-                    string result = "";
+                    dstring result = "";
                     if (arguments.length == 1) {
                         Command command = findCommand(arguments[0], topLevelCmd);
                         if (command !is null) {
@@ -485,7 +492,7 @@ class Parser
             "quit", "Quit the app",
             new class Runnable
             {
-                override void run(char[][] arguments)
+                override void run(dchar[][] arguments)
                 {
                     isRun = false;
                 }
@@ -498,7 +505,7 @@ class Parser
         ]);
     }
     
-    private Command findCommand(ref char[] name, Command parent)
+    private Command findCommand(ref dchar[] name, Command parent)
     {
         foreach (ref Command cmd; parent.nextCommands) {
             if (cmd.name == name) {
@@ -515,22 +522,22 @@ class Parser
         }
     }
     
-    private string generateHelp(Command parentCmd, int level, ref string result)
+    private dstring generateHelp(Command parentCmd, int level, ref dstring result)
     {
-        string spaces = "";
+        dstring spaces = ""d;
         if (parentCmd.name !is null) {
-            result ~= "\n\n";
+            result ~= "\n\n"d;
             for (int i = 0; i < level; i++) {
-                result ~= "\t";
-                spaces ~= "\t";
+                result ~= "\t"d;
+                spaces ~= "\t"d;
             }
-            result ~= "- " ~ parentCmd.name ~ "\t" ~ parentCmd.description;
+            result ~= "- "d ~ parentCmd.name ~ "\t"d ~ parentCmd.description;
         }
         
         if (parentCmd.parameters.length > 0) {
-            result ~= "\n" ~ spaces ~ "\t" ~ "Parameters:";
+            result ~= "\n"d ~ spaces ~ "\t"d ~ "Parameters:"d;
             foreach (ref Parameter parameter; parentCmd.parameters) {
-                result ~= "\n" ~ spaces ~ "\t: " ~ (!parameter.isMandatory ? "[Optional] " : "")
+                result ~= "\n"d ~ spaces ~ "\t: "d ~ (!parameter.isMandatory ? "[Optional] "d : ""d)
                     ~ parameter.description;
             }
         }
@@ -542,14 +549,14 @@ class Parser
         return result;
     }
     
-    private void parseAndExecute(char[] line)
+    private void parseAndExecute(dchar[] line)
     {
         Command currCommand = topLevelCmd;
-        char[] currToken;
+        dchar[] currToken;
         size_t argIndex = 0;
-        char[][] arguments;
+        dchar[][] arguments;
         
-        charLoop: foreach (size_t cIndex, ref char c; line) {
+        dcharLoop: foreach (size_t cIndex, ref dchar c; line) {
             if ((c == ' ' || c == '\t' || c == '\n' || c=='\r') && currToken.length > 0) {
                 // Process found token
                 if (currCommand.parameters.length == 0) {
@@ -566,7 +573,7 @@ class Parser
                     if (currCommand.parameters.length > argIndex) {
                         if (currCommand.parameters[argIndex].dataType == DataType.MULTIPLE) {
                             arguments ~= line[(cIndex - currToken.length)..($ - 1)];
-                            break charLoop;
+                            break dcharLoop;
                         } else if (currCommand.parameters[argIndex].dataType == DataType.INT) {
                             if (isNumeric(currToken, false)) {
                                 arguments ~= currToken;
@@ -585,7 +592,7 @@ class Parser
                 }
                 currToken = [];
             } else {
-                // Add char to unfinished token
+                // Add dchar to unfinished token
                 currToken ~= c;
             }
         }
@@ -612,7 +619,7 @@ class Parser
 
 void main()
 {
-    char[] buffer;
+    dchar[] buffer;
     Workspace workspace = new Workspace();
     auto parser = new Parser(workspace);
     writeln("Welcome to Asciiplant command line utility!\n- Type 'help' to get available command description.\n- Type 'quit' to exit.");

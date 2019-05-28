@@ -137,7 +137,7 @@ extern (C) int UIAppMain(string[] args)
             window.close();
             return true;
         } else if (a.id == ACTION_NEW_NODE) {
-            auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_CREATE_NEW_NODE"), window, 1u, 300, 200);
+            auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_CREATE_NEW_NODE"), window, WindowFlag.Modal | WindowFlag.Resizable, 300, 200);
             auto vLayout = new VerticalLayout();
             vLayout.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
             // Label
@@ -153,7 +153,7 @@ extern (C) int UIAppMain(string[] args)
             bLayout.layoutWidth(FILL_PARENT);
             auto okButton = new Button(null, UIString.fromId("TXT_OK"));
             okButton.click = delegate(Widget src) {
-                Node node = workspaceContainer.workspace.createNode(to!string(nodeContent.text));
+                Node node = workspaceContainer.workspace.createNode(nodeContent.text);
                 contentWindow.close();
                 workspaceContainer.draw();
                 return true;
@@ -174,7 +174,7 @@ extern (C) int UIAppMain(string[] args)
             Node node = workspaceContainer.workspace
                 .getNodeAt(workspaceContainer.mainText.caretX, workspaceContainer.mainText.caretY);
             if (node !is null) {
-                auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_EDIT_NODE"), window, 1u, 300, 200);
+                auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_EDIT_NODE"), window, WindowFlag.Modal | WindowFlag.Resizable, 300, 200);
                 auto vLayout = new VerticalLayout();
                 vLayout.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
                 // Label
@@ -191,7 +191,7 @@ extern (C) int UIAppMain(string[] args)
                 bLayout.layoutWidth(FILL_PARENT);
                 auto okButton = new Button(null, UIString.fromId("TXT_OK"));
                 okButton.click = delegate(Widget src) {
-                    node.content = to!string(nodeContent.text);
+                    node.content = nodeContent.text;
                     contentWindow.close();
                     workspaceContainer.draw();
                     return true;
@@ -227,7 +227,7 @@ extern (C) int UIAppMain(string[] args)
             if (fromNode !is null) {
                 workspaceContainer.currLinkFromNode = fromNode;
                 if (workspaceContainer.currLinkToNode !is null) {
-                    auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_NEW_LINK_DESCRIPTION"), window, 1u, 300, 200);
+                    auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_NEW_LINK_DESCRIPTION"), window, WindowFlag.Modal | WindowFlag.Resizable, 300, 200);
                     auto vLayout = new VerticalLayout();
                     vLayout.layoutWidth(FILL_PARENT);
                     // Label
@@ -243,7 +243,7 @@ extern (C) int UIAppMain(string[] args)
                     bLayout.layoutWidth(FILL_PARENT);
                     auto okButton = new Button(null, UIString.fromId("TXT_OK"));
                     okButton.click = delegate(Widget src) {
-                        workspaceContainer.workspace.linkNodes(workspaceContainer.currLinkFromNode, workspaceContainer.currLinkToNode, to!string(linkDescription.text));
+                        workspaceContainer.workspace.linkNodes(workspaceContainer.currLinkFromNode, workspaceContainer.currLinkToNode, linkDescription.text);
                         workspaceContainer.resetTemporaryNodes();
                         contentWindow.close();
                         workspaceContainer.draw();
@@ -271,7 +271,7 @@ extern (C) int UIAppMain(string[] args)
             if (toNode !is null) {
                 workspaceContainer.currLinkToNode = toNode;
                 if (workspaceContainer.currLinkFromNode !is null) {
-                    auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_NEW_LINK_DESCRIPTION"), window, 1u, 300, 200);
+                    auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_NEW_LINK_DESCRIPTION"), window, WindowFlag.Modal | WindowFlag.Resizable, 300, 200);
                     auto vLayout = new VerticalLayout();
                     vLayout.layoutWidth(FILL_PARENT);
                     // Label
@@ -287,7 +287,7 @@ extern (C) int UIAppMain(string[] args)
                     bLayout.layoutWidth(FILL_PARENT);
                     auto okButton = new Button(null, UIString.fromId("TXT_OK"));
                     okButton.click = delegate(Widget src) {
-                        workspaceContainer.workspace.linkNodes(workspaceContainer.currLinkFromNode, workspaceContainer.currLinkToNode, to!string(linkDescription.text));
+                        workspaceContainer.workspace.linkNodes(workspaceContainer.currLinkFromNode, workspaceContainer.currLinkToNode, linkDescription.text);
                         workspaceContainer.resetTemporaryNodes();
                         contentWindow.close();
                         workspaceContainer.draw();
@@ -313,7 +313,7 @@ extern (C) int UIAppMain(string[] args)
             Link link = workspaceContainer.workspace
                 .getLinkAt(workspaceContainer.mainText.caretX, workspaceContainer.mainText.caretY);
             if (link !is null) {
-                auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_EDIT_LINK_DESCRIPTION"), window, 1u, 300, 200);
+                auto contentWindow = Platform.instance.createWindow(UIString.fromId("TXT_EDIT_LINK_DESCRIPTION"), window, WindowFlag.Modal | WindowFlag.Resizable, 300, 200);
                 auto vLayout = new VerticalLayout();
                 vLayout.layoutWidth(FILL_PARENT).layoutHeight(FILL_PARENT);
                 // Label
@@ -330,7 +330,7 @@ extern (C) int UIAppMain(string[] args)
                 bLayout.layoutWidth(FILL_PARENT);
                 auto okButton = new Button(null, UIString.fromId("TXT_OK"));
                 okButton.click = delegate(Widget src) {
-                    link.description = to!string(linkDescription.text);
+                    link.description = linkDescription.text;
                     contentWindow.close();
                     workspaceContainer.draw();
                     return true;
@@ -489,7 +489,8 @@ class WorkspaceContainer : VerticalLayout
         
         DockHost dockLayout = new DockHost();
         
-        DockWindow settingsDock = new DockWindow("2");
+        DockWindow settingsDock = new DockWindow("SETTINGS_DOCK");
+        settingsDock.backgroundColor("grey");
         settingsDock.caption.textResource("CAP_SETTINGS"c);
         settingsDock.dockAlignment(DockAlignment.Right);
         dockLayout.addDockedWindow(settingsDock);
@@ -538,7 +539,8 @@ class WorkspaceContainer : VerticalLayout
         settingsLayout.addChild(settingsTable);
         settingsDock.bodyWidget(settingsLayout.layoutWidth(FILL_PARENT));
         
-        DockWindow pathsDock = new DockWindow("3");
+        DockWindow pathsDock = new DockWindow("PATHS_DOCK");
+        pathsDock.backgroundColor("grey");
         pathsDock.caption.textResource("CAP_PATHS"c);
         pathsDock.dockAlignment(DockAlignment.Bottom);
         pathsDisplay = new EditBox();
@@ -685,7 +687,7 @@ class CustomMainMenu : MainMenu
         fileItem.add(new Action(ACTION_FILE_SAVE_DATA, "MENU_FILE_SAVE_DATA"c, "document-save-data", KeyCode.KEY_S, KeyFlag.Control));
         fileItem.add(new Action(ACTION_FILE_SAVE_DATA_AS, "MENU_FILE_SAVE_DATA_AS"c, "document-save-data", KeyCode.KEY_S, KeyFlag.Control));
         fileItem.add(sep);
-        fileItem.add(new Action(ACTION_FILE_SAVE_VIS, "MENU_FILE_SAVE_VIS"c, "document-save-vis", KeyCode.KEY_S, KeyFlag.Control));
+        fileItem.add(new Action(ACTION_FILE_SAVE_VIS, "MENU_FILE_SAVE_VIS"c, "document-save-vis", KeyCode.KEY_E, KeyFlag.Control));
         fileItem.add(sep);
         fileItem.add(new Action(ACTION_FILE_EXIT, "MENU_FILE_EXIT"c, "document-close"c, KeyCode.KEY_X, KeyFlag.Alt));
         mainMenuItems.add(fileItem);

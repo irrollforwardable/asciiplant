@@ -18,12 +18,12 @@ class ModelHandler
         this._pathFinder = new PathFinder();
     }
     
-    public Node createNode(string content)
+    public Node createNode(dstring content)
     {
         return createNode(++currId, content);
     }
     
-    public Node createNode(int id, string content)
+    public Node createNode(int id, dstring content)
     {
         if (findNodeById(id) is null) {
             Node node = new Node(id, content);
@@ -48,7 +48,7 @@ class ModelHandler
         }
     }
     
-    public Link linkNodes(Node fromNode, Node toNode, string description)
+    public Link linkNodes(Node fromNode, Node toNode, dstring description)
     {
         if (fromNode is null || toNode is null) {
             return null;
