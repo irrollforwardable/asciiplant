@@ -1,4 +1,4 @@
-# asciiplant
+# Asciiplant
 Minimalistic tool for creating ASCII flowcharts written in D language.
 
 ### Core package
